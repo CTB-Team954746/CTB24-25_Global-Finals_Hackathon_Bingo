@@ -145,7 +145,6 @@
       margin: 1rem 0 0 0;
     }
 
-
     .bingo-line.row-0 { top: 18%; left: 10%; right: 10%; }
     .bingo-line.row-1 { top: 48%; left: 10%; right: 10%; }
     .bingo-line.row-2 { top: 78%; left: 10%; right: 10%; }
@@ -232,15 +231,15 @@
     const doneBtn = document.getElementById('done-button');
 
     const cellFrontTexts = [
-        'I don’t deserve to be here', 'Everyone else is smarter than me', 'I just got lucky',
-        'I’m afraid they’ll discover I’m not good enough', 'It’s only a matter of time before I’m exposed', 'I’m just faking it well',
-        'My achievements are overrated', 'I can’t ask questions – I’ll look stupid', 'I don’t belong here',
+        'I don\'t deserve to be here', 'Everyone else is smarter than me', 'I just got lucky',
+        'I\'m afraid they\'ll discover I\'m not good enough', 'It\'s only a matter of time before I\'m exposed', 'I\'m just faking it well',
+        'My achievements are overrated', 'I can\'t ask questions – I\'ll look stupid', 'I don\'t belong here',
     ];
 
     const cellBackTexts = [
-        'I’m getting better every day', 'I deserve this opportunity', 'It’s okay to ask for help',
-        'I failed, but I learned from it', 'This isn’t luck – I worked for it', 'I’m still learning',
-        'I acknowledge my own worth', 'Everyone feels unsure sometimes', 'I’m proud of myself'
+        'I\'m getting better every day', 'I deserve this opportunity', 'It\'s okay to ask for help',
+        'I failed, but I learned from it', 'This isn\'t luck – I worked for it', 'I\'m still learning',
+        'I acknowledge my own worth', 'Everyone feels unsure sometimes', 'I\'m proud of myself'
     ];
 
     // Mock percentage data
@@ -262,6 +261,7 @@
       for (let i = 0; i < gridSize * gridSize; i++) {
         const cell = document.createElement('div');
         cell.className = 'cell';
+        cell.dataset.index = i;
 
         const card = document.createElement('div');
         card.className = 'card';
@@ -336,13 +336,21 @@
 
     doneBtn.addEventListener('click', () => {
       gameDone = true;
-      document.querySelectorAll('.cell').forEach((cell, i) => {
-        cell.classList.add('selected');
-        const percentNote = cell.querySelector('.percent-note');
-        if (percentNote) {
-          percentNote.style.display = 'block';
+      
+      // Only flip and show percentage for selected cells
+      document.querySelectorAll('.cell').forEach((cell) => {
+        if (cell.classList.contains('selected')) {
+          // For already selected cells, show the percentage note
+          const percentNote = cell.querySelector('.percent-note');
+          if (percentNote) {
+            percentNote.style.display = 'block';
+          }
+        } else {
+          // Don't flip non-selected cells
+          cell.classList.remove('selected');
         }
       });
+      
       updateBingoCount();
     });
 

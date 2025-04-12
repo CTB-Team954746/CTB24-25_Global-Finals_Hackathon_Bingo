@@ -34,6 +34,8 @@
     flex-direction: column;
     align-items: center;
     padding: 1rem;
+    max-width: 1000px;
+    margin: 0 auto;
   }
   
   .game-title {
@@ -136,5 +138,21 @@
       font-size: 0.9rem;
       padding: 0.5rem 1rem;
     }
+  }
+
+  .bingo-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(3rem, var(--cell-size)));
+    grid-auto-rows: minmax(3rem, var(--cell-size));
+    gap: var(--gap-size);
+  
+    margin-bottom: 1rem;
+    width: 100%;
+    max-width: calc(var(--cell-size) * 5 + var(--gap-size) * 4);
+    
+    /* 居中对齐 */
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
   }
   

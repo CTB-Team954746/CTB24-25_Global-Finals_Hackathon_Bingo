@@ -225,7 +225,7 @@
 </head>
 <body>
   <header>
-    <h1 class="game-title">“I’m Becoming Who I’m Meant to Be” – A Growth Mindset Pathway to Self-Affirmation</h1>
+    <h1 class="game-title">"I'm Becoming Who I'm Meant to Be" – A Growth Mindset Pathway to Self-Affirmation</h1>
   </header>
 
   <main>
@@ -248,46 +248,46 @@
     const doneBtn = document.getElementById('done-button');
 
     const cellFrontTexts = [
-    'I’m getting better every day', 'I deserve this opportunity', 'It’s okay to ask for help',
-    'I failed, but I learned from it', 'This isn’t luck – I worked for it', 'I’m still learning',
-    'I acknowledge my own worth', 'Everyone feels unsure sometimes', 'I’m proud of myself'
+        'I don’t deserve to be here', 'Everyone else is smarter than me', 'I just got lucky',
+        'I’m afraid they’ll discover I’m not good enough', 'It’s only a matter of time before I’m exposed', 'I’m just faking it well',
+        'My achievements are overrated', 'I can’t ask questions – I’ll look stupid', 'I don’t belong here',
     ];
 
     const cellBackTexts = [
-    'Growth takes time', 'You earned your place', 'Support builds strength',
-    'Failure is feedback', 'Hard work pays off', 'Learning is progress',
-    'You have value', 'Doubt is human', 'Celebrate progress'
+        'I’m getting better every day', 'I deserve this opportunity', 'It’s okay to ask for help',
+        'I failed, but I learned from it', 'This isn’t luck – I worked for it', 'I’m still learning',
+        'I acknowledge my own worth', 'Everyone feels unsure sometimes', 'I’m proud of myself'
     ];
 
     // Mock percentage data
     const percentageData = [
-    67, 45, 82,
-    39, 71, 58,
-    64, 47, 75
+      67, 45, 82,
+      39, 71, 58,
+      64, 47, 75
     ];
 
     let completed = [];
     let gameDone = false;
 
     function initGame() {
-    grid.innerHTML = '';
-    bingoCountEl.innerText = '';
-    completed = Array.from({ length: gridSize }, () => Array(gridSize).fill(false));
-    gameDone = false;
+      grid.innerHTML = '';
+      bingoCountEl.innerText = '';
+      completed = Array.from({ length: gridSize }, () => Array(gridSize).fill(false));
+      gameDone = false;
 
-    for (let i = 0; i < gridSize * gridSize; i++) {
+      for (let i = 0; i < gridSize * gridSize; i++) {
         const cell = document.createElement('div');
         cell.className = 'cell';
 
         const card = document.createElement('div');
-        card.className = 'flip-card-inner';
+        card.className = 'card';
 
         const front = document.createElement('div');
-        front.className = 'flip-card-front';
+        front.className = 'front';
         front.innerText = cellFrontTexts[i];
 
         const back = document.createElement('div');
-        back.className = 'flip-card-back';
+        back.className = 'back';
         back.innerText = cellBackTexts[i];
 
         const percentNote = document.createElement('div');
@@ -304,77 +304,77 @@
         const col = i % gridSize;
 
         cell.addEventListener('click', () => {
-        if (!gameDone) {
+          if (!gameDone) {
             completed[row][col] = !completed[row][col];
-            cell.classList.toggle('completed');
-        }
+            cell.classList.toggle('selected');
+          }
         });
 
         grid.appendChild(cell);
-    }
+      }
     }
 
     function showBingoLines(bingos) {
-    bingos.forEach((type, idx) => {
+      bingos.forEach((type, idx) => {
         const line = document.createElement('div');
         line.classList.add('bingo-line', type);
         line.style.setProperty('--index', idx);
         document.body.appendChild(line);
-    });
+      });
     }
 
     function updateBingoCount() {
-    let count = 0;
-    const bingos = [];
+      let count = 0;
+      const bingos = [];
 
-    for (let row = 0; row < gridSize; row++) {
+      for (let row = 0; row < gridSize; row++) {
         if (completed[row].every(c => c)) {
-        count++;
-        bingos.push(`row-${row}`);
+          count++;
+          bingos.push(`row-${row}`);
         }
-    }
+      }
 
-    for (let col = 0; col < gridSize; col++) {
+      for (let col = 0; col < gridSize; col++) {
         if (completed.every(row => row[col])) {
-        count++;
-        bingos.push(`col-${col}`);
+          count++;
+          bingos.push(`col-${col}`);
         }
-    }
+      }
 
-    if ([0, 1, 2].every(i => completed[i][i])) {
+      if ([0, 1, 2].every(i => completed[i][i])) {
         count++;
         bingos.push('diag-main');
-    }
-    if ([0, 1, 2].every(i => completed[i][gridSize - 1 - i])) {
+      }
+      if ([0, 1, 2].every(i => completed[i][gridSize - 1 - i])) {
         count++;
         bingos.push('diag-anti');
-    }
+      }
 
-    if (count > 0) {
+      if (count > 0) {
+        bingoCountEl.style.display = 'block';
         bingoCountEl.innerHTML = `<span class="bingo-highlight">Bingo: ${count}</span>`;
         showBingoLines(bingos);
-    } else {
+      } else {
+        bingoCountEl.style.display = 'none';
         bingoCountEl.innerText = 'Bingo: 0';
-    }
+      }
     }
 
     resetBtn.addEventListener('click', () => {
-    document.querySelectorAll('.bingo-line').forEach(e => e.remove());
-    initGame();
+      document.querySelectorAll('.bingo-line').forEach(e => e.remove());
+      initGame();
     });
 
     doneBtn.addEventListener('click', () => {
-    gameDone = true;
-    document.querySelectorAll('.cell').forEach((cell, i) => {
-        cell.classList.add('flipped');
-        if (cell.classList.contains('completed')) {
+      gameDone = true;
+      document.querySelectorAll('.cell').forEach((cell, i) => {
+        cell.classList.add('selected');
         const percentNote = cell.querySelector('.percent-note');
         if (percentNote) {
-            percentNote.style.display = 'block';
+          percentNote.style.display = 'block';
         }
-        }
-    });
-    updateBingoCount();
+      });
+      updateBingoCount();
     });
 
     initGame();

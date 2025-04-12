@@ -145,13 +145,6 @@
       margin: 1rem 0 0 0;
     }
 
-    .bingo-line {
-        position: absolute;
-        height: 4px;
-        background: red;
-        z-index: 10;
-        animation: glow 1s ease-in-out infinite alternate;
-    }
 
     .bingo-line.row-0 { top: 18%; left: 10%; right: 10%; }
     .bingo-line.row-1 { top: 48%; left: 10%; right: 10%; }
@@ -197,15 +190,6 @@
         background: green;
         transform: rotate(-45deg);
         transform-origin: top right;
-    }
-
-    @keyframes glow {
-        from {
-            box-shadow: 0 0 5px #ff4081, 0 0 10px #ff4081;
-        }
-        to {
-            box-shadow: 0 0 20px #ff4081, 0 0 30px #ff4081;
-        }
     }
 
     .percent-note {
@@ -314,46 +298,31 @@
       }
     }
 
-    function showBingoLines(bingos) {
-      bingos.forEach((type, idx) => {
-        const line = document.createElement('div');
-        line.classList.add('bingo-line', type);
-        line.style.setProperty('--index', idx);
-        document.body.appendChild(line);
-      });
-    }
-
     function updateBingoCount() {
       let count = 0;
-      const bingos = [];
 
       for (let row = 0; row < gridSize; row++) {
         if (completed[row].every(c => c)) {
           count++;
-          bingos.push(`row-${row}`);
         }
       }
 
       for (let col = 0; col < gridSize; col++) {
         if (completed.every(row => row[col])) {
           count++;
-          bingos.push(`col-${col}`);
         }
       }
 
       if ([0, 1, 2].every(i => completed[i][i])) {
         count++;
-        bingos.push('diag-main');
       }
       if ([0, 1, 2].every(i => completed[i][gridSize - 1 - i])) {
         count++;
-        bingos.push('diag-anti');
       }
 
       if (count > 0) {
         bingoCountEl.style.display = 'block';
         bingoCountEl.innerHTML = `<span class="bingo-highlight">Bingo: ${count}</span>`;
-        showBingoLines(bingos);
       } else {
         bingoCountEl.style.display = 'none';
         bingoCountEl.innerText = 'Bingo: 0';

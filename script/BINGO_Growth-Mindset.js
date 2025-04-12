@@ -1,14 +1,12 @@
-const gridSize = 5;
+const gridSize = 3;
 const grid = document.getElementById('bingo-grid');
 const bingoCountEl = document.getElementById('bingo-count');
 const resetBtn = document.getElementById('reset-button');
 
 const cellTexts = [
-  '文本1', '文本2', '文本3',
-  '文本6', '文本7', '文本8',
-  '文本11', '文本12', '文本13',
-  '文本16', '文本17', '文本18',
-  '文本21', '文本22', '文本23'
+  'I’m getting better every day', 'I deserve this opportunity', 'It’s okay to ask for help',
+  'I failed, but I learned from it', 'This isn’t luck – I worked for it', 'I’m still learning',
+  'I acknowledge my own worth', 'Everyone feels unsure sometimes', 'I’m proud of myself'
 ];
 
 let completed = [];
@@ -50,8 +48,8 @@ function updateBingoCount() {
   }
 
   // 对角线
-  if ([0, 1, 2, 3, 4].every(i => completed[i][i])) count++;
-  if ([0, 1, 2, 3, 4].every(i => completed[i][gridSize - 1 - i])) count++;
+  if ([0, 1, 2].every(i => completed[i][i])) count++;
+  if ([0, 1, 2].every(i => completed[i][gridSize - 1 - i])) count++;
 
   bingoCountEl.innerText = `Bingo: ${count}`;
 }

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BINGO | Growth Mindset</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <style>
+    :root {
+      --cell-size: 10rem;
+      --font-size: 1.2rem;
+      --gap-size: 0.5rem;
+      --primary-color: #4caf50;
+      --text-color: #fff;
+      --border-color: #ccc;
+      --completed-border: #388e3c;
+      --checkmark-size: 2rem;
+      --bingo-font-size: 1.2rem;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background-color: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header, footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: #e0e0e0;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .game-title {
+      font-size: 2rem;
+      margin: 0.5rem 0;
+    }
+
+    #bingo-count {
+      font-size: var(--bingo-font-size);
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .bingo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(3rem, var(--cell-size)));
+      grid-auto-rows: minmax(3rem, var(--cell-size));
+      gap: var(--gap-size);
+      margin-bottom: 1rem;
+      width: 100%;
+      max-width: calc(var(--cell-size) * 3 + var(--gap-size) * 2);
+      justify-content: center;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cell {
+      perspective: 1000px;
+      cursor: pointer;
+    }
+
+    .card {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+    }
+
+    .cell.selected .card {
+      transform: rotateY(180deg);
+    }
+
+    .front, .back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: var(--font-size);
+      padding: 0.5rem;
+      background-color: #fff;
+      border: 2px solid var(--border-color);
+      word-break: break-word;
+    }
+
+    .back {
+      background-color: var(--primary-color);
+      color: var(--text-color);
+      transform: rotateY(180deg);
+    }
+
+    button {
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 0.3rem;
+      cursor: pointer;
+      margin: 0.5rem;
+    }
+
+    #reset-button {
+      background-color: #d32f2f;
+      color: white;
+    }
+
+    #reset-button:hover {
+      background-color: #b71c1c;
+    }
+
+    #done-button {
+      background-color: #388e3c;
+      color: white;
+    }
+
+    #done-button:hover {
+      background-color: #2e7d32;
+    }
+
+    footer p {
+      font-size: 0.9rem;
+      color: #666;
+      margin: 1rem 0 0 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 class="game-title">“I’m Becoming Who I’m Meant to Be” – A Growth Mindset Pathway to Self-Affirmation</h1>
+  </header>
+
+  <main>
+    <div id="bingo-count">Bingo: 0</div>
+    <div id="bingo-grid" class="bingo-grid"></div>
+    <button id="done-button">DONE</button>
+    <button id="reset-button">RESET</button>
+  </main>
+
+  <footer>
+    <p>© CTB24-25 Hackathon Group No. H130</p>
+    <p><a href="https://github.com/404notfound-xyye/CTB24-25_Global-Finals_Hackathon_Bingo">Source Code</a></p>
+  </footer>
+
+  <script>
+    const gridSize = 3;
+    const grid = document.getElementById('bingo-grid');
+    const bingoCountEl = document.getElementById('bingo-count');
+    const resetBtn = document.getElementById('reset-button');
+    const doneBtn = document.getElementById('done-button');
+
+    const frontTexts = [
+        'I don’t deserve to be here', 'Everyone else is smarter than me', 'I just got lucky',
+        'I’m afraid they’ll discover I’m not good enough', 'It’s only a matter of time before I’m exposed', 'I’m just faking it well',
+        'My achievements are overrated', 'I can’t ask questions – I’ll look stupid', 'I don’t belong here'
+    ];
+
+    const backTexts = [
+        'I’m getting better every day', 'I deserve this opportunity', 'It’s okay to ask for help',
+        'I failed, but I learned from it', 'This isn’t luck – I worked for it', 'I’m still learning',
+        'I acknowledge my own worth', 'Everyone feels unsure sometimes', 'I’m proud of myself'
+    ];
+
+    let completed = [];
+
+    function initGame() {
+      grid.innerHTML = '';
+      completed = Array.from({ length: gridSize }, () => Array(gridSize).fill(false));
+
+      for (let i = 0; i < gridSize * gridSize; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const front = document.createElement('div');
+        front.className = 'front';
+        front.innerText = frontTexts[i];
+
+        const back = document.createElement('div');
+        back.className = 'back';
+        back.innerText = backTexts[i];
+
+        card.appendChild(front);
+        card.appendChild(back);
+        cell.appendChild(card);
+
+        const row = Math.floor(i / gridSize);
+        const col = i % gridSize;
+
+        cell.addEventListener('click', () => {
+          if (!cell.classList.contains('flipped')) {
+            completed[row][col] = !completed[row][col];
+            cell.classList.toggle('selected');
+          }
+        });
+
+        grid.appendChild(cell);
+      }
+
+      bingoCountEl.style.display = 'none';
+    }
+
+    doneBtn.addEventListener('click', () => {
+      document.querySelectorAll('.cell.selected').forEach(cell => {
+        cell.classList.add('flipped');
+      });
+      bingoCountEl.style.display = 'block';
+      updateBingoCount();
+    });
+
+    function updateBingoCount() {
+      let count = 0;
+
+      // Rows
+      for (let row of completed) {
+        if (row.every(c => c)) count++;
+      }
+
+      // Columns
+      for (let col = 0; col < gridSize; col++) {
+        if (completed.every(row => row[col])) count++;
+      }
+
+      // Diagonals
+      if ([0, 1, 2].every(i => completed[i][i])) count++;
+      if ([0, 1, 2].every(i => completed[i][gridSize - 1 - i])) count++;
+
+      bingoCountEl.innerText = `Bingo: ${count}`;
+    }
+
+    resetBtn.addEventListener('click', () => {
+      initGame();
+    });
+
+    initGame();
+  </script>
+</body>
+</html>

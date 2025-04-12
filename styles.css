@@ -1,0 +1,140 @@
+:root {
+    --cell-size: 6rem;
+    --font-size: 1rem;
+    --gap-size: 0.5rem;
+    --primary-color: #4caf50;
+    --text-color: #fff;
+    --border-color: #ccc;
+    --completed-border: #388e3c;
+    --checkmark-size: 2rem;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  header, footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: #e0e0e0;
+  }
+  
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+  }
+  
+  .game-title {
+    font-size: 2rem;
+    margin: 0.5rem 0;
+  }
+  
+  #bingo-count {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .bingo-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(3rem, var(--cell-size)));
+    grid-auto-rows: minmax(3rem, var(--cell-size));
+    gap: var(--gap-size);
+    margin-bottom: 1rem;
+    width: 100%;
+    max-width: 90vw;
+  }
+  
+  .cell {
+    position: relative;
+    background-color: #fff;
+    border: 2px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: var(--font-size);
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    min-height: 3rem;
+    word-break: break-word;
+  }
+  
+  .cell.completed {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: var(--text-color);
+    border-color: var(--completed-border);
+  }
+  
+  .cell::after {
+    content: '';
+    position: absolute;
+    font-size: var(--checkmark-size);
+    color: white;
+    display: none;
+  }
+  
+  .cell.completed::after {
+    content: '✔';
+    display: block;
+    font-size: var(--checkmark-size);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  
+  #reset-button {
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    background-color: #d32f2f;
+    color: white;
+    border: none;
+    border-radius: 0.3rem;
+    cursor: pointer;
+  }
+  
+  #reset-button:hover {
+    background-color: #b71c1c;
+  }
+  
+  footer p {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 1rem 0 0 0;
+  }
+  
+  /* 小屏幕优化 */
+  @media (max-width: 600px) {
+    :root {
+      --cell-size: 4.5rem;
+      --font-size: 0.8rem;
+      --checkmark-size: 1.5rem;
+    }
+  
+    .game-title {
+      font-size: 1.5rem;
+    }
+  
+    #bingo-count {
+      font-size: 1rem;
+    }
+  
+    #reset-button {
+      font-size: 0.9rem;
+      padding: 0.5rem 1rem;
+    }
+  }
+  

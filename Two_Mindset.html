@@ -96,6 +96,7 @@
       height: 100%;
       backface-visibility: hidden;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
@@ -119,6 +120,7 @@
       border-radius: 0.3rem;
       cursor: pointer;
       margin: 0.5rem;
+      position: relative;
     }
 
     #reset-button {
@@ -133,6 +135,8 @@
     #done-button {
       background-color: #388e3c;
       color: white;
+      overflow: visible;
+      z-index: 5;
     }
 
     #done-button:hover {
@@ -192,17 +196,105 @@
     }
 
     .percent-note {
-        margin-top: 0.5rem;
+        margin-top: 1rem;
         font-size: 0.9rem;
         color: #ffe082;
         animation: fadeIn 1s ease-in forwards;
         opacity: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .percent-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 0.2rem;
     }
 
     @keyframes fadeIn {
         to {
             opacity: 1;
         }
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+    }
+
+    .modal-content {
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 4px;
+      max-width: 600px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transform: translateY(-20px);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.show .modal-content {
+      transform: translateY(0);
+    }
+
+    .modal-close {
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background-color 0.3s;
+    }
+
+    .modal-close:hover {
+      background-color: #388e3c;
+    }
+
+    /* Enhanced Fireworks CSS */
+    .firework {
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      opacity: 0;
+      animation: explode 1s ease-out forwards;
+      transform: translate(0, 0);
+    }
+
+    @keyframes explode {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0);
+      }
+      100% {
+        opacity: 0;
+        transform: var(--final-transform);
+      }
     }
   </style>
 </head>
@@ -223,12 +315,25 @@
     <p><a href="https://github.com/404notfound-xyye/CTB24-25_Global-Finals_Hackathon_Bingo">Source Code</a></p>
   </footer>
 
+  <!-- Modal popup -->
+  <div id="welcome-modal" class="modal-overlay">
+    <div class="modal-content">
+      <h2>Welcome to Growth Mindset Bingo!</h2>
+      <p>This interactive game helps you transform negative self-talk into positive affirmations.</p>
+      <p>Click on a negative thought you've experienced to flip it and reveal a growth-oriented perspective.</p>
+      <p>After selecting all that apply to you, click "DONE" to see how many others share similar experiences.</p>
+      <button id="modal-close" class="modal-close">I Know</button>
+    </div>
+  </div>
+
   <script>
     const gridSize = 3;
     const grid = document.getElementById('bingo-grid');
     const bingoCountEl = document.getElementById('bingo-count');
     const resetBtn = document.getElementById('reset-button');
     const doneBtn = document.getElementById('done-button');
+    const modal = document.getElementById('welcome-modal');
+    const modalCloseBtn = document.getElementById('modal-close');
 
     const cellFrontTexts = [
         'I don\'t deserve to be here', 'Everyone else is smarter than me', 'I just got lucky',
@@ -252,6 +357,21 @@
     let completed = [];
     let gameDone = false;
 
+    // Show the welcome modal when the page loads
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        modal.classList.add('show');
+      }, 500);
+    });
+
+    // Close the modal when the "I Know" button is clicked
+    modalCloseBtn.addEventListener('click', () => {
+      modal.classList.remove('show');
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 300);
+    });
+
     function initGame() {
       grid.innerHTML = '';
       bingoCountEl.innerText = '';
@@ -272,12 +392,29 @@
 
         const back = document.createElement('div');
         back.className = 'back';
-        back.innerText = cellBackTexts[i];
+        
+        // Main affirmation text
+        const affirmationText = document.createElement('div');
+        affirmationText.innerText = cellBackTexts[i];
+        back.appendChild(affirmationText);
 
+        // Percentage note with vertical layout
         const percentNote = document.createElement('div');
         percentNote.className = 'percent-note';
-        percentNote.innerText = `${percentageData[i]}% of people also felt this`;
+        
+        // Percentage value (larger, on top)
+        const percentValue = document.createElement('div');
+        percentValue.className = 'percent-value';
+        percentValue.innerText = `${percentageData[i]}%`;
+        
+        // Text label (smaller, below)
+        const percentLabel = document.createElement('div');
+        percentLabel.innerText = 'of people also felt this';
+        
+        percentNote.appendChild(percentValue);
+        percentNote.appendChild(percentLabel);
         percentNote.style.display = 'none';
+        
         back.appendChild(percentNote);
 
         card.appendChild(front);
@@ -329,6 +466,122 @@
       }
     }
 
+    // Enhanced fireworks effect from DONE button
+    function createFireworks(sourceElement) {
+      const rect = sourceElement.getBoundingClientRect();
+      const startX = rect.left + rect.width / 2;
+      const startY = rect.top + rect.height / 2;
+      
+      const colors = [
+        '#ff0000', '#ff7700', '#ffff00', '#00ff00', 
+        '#0000ff', '#8a2be2', '#ff00ff', '#ff1493', 
+        '#00ffff', '#ffd700', '#fa8072'
+      ];
+      
+      // Create multiple fireworks
+      for (let i = 0; i < 8; i++) {
+        setTimeout(() => {
+          launchFirework(startX, startY, colors);
+        }, i * 300);
+      }
+    }
+    
+    function launchFirework(startX, startY, colors) {
+      // Create the firework container
+      const firework = document.createElement('div');
+      firework.className = 'firework';
+      document.body.appendChild(firework);
+      
+      // Random endpoint position (higher up from the button)
+      const endX = startX + (Math.random() * 200 - 100);
+      const endY = startY - Math.random() * 300 - 100; // Always upward
+      
+      // Create the initial launch particle
+      const launcher = document.createElement('div');
+      launcher.className = 'particle';
+      launcher.style.left = `${startX}px`;
+      launcher.style.top = `${startY}px`;
+      launcher.style.background = colors[Math.floor(Math.random() * colors.length)];
+      launcher.style.width = '4px';
+      launcher.style.height = '4px';
+      
+      // Custom animation for launcher
+      launcher.style.animation = 'none';
+      launcher.style.opacity = '1';
+      
+      firework.appendChild(launcher);
+      
+      // Animate the launcher from start to end position
+      const launchDuration = 0.5; // seconds
+      
+      let startTime = null;
+      function animateLaunch(timestamp) {
+        if (!startTime) startTime = timestamp;
+        const progress = (timestamp - startTime) / (launchDuration * 1000);
+        
+        if (progress < 1) {
+          const currentX = startX + (endX - startX) * progress;
+          const currentY = startY + (endY - startY) * progress;
+          
+          launcher.style.left = `${currentX}px`;
+          launcher.style.top = `${currentY}px`;
+          
+          requestAnimationFrame(animateLaunch);
+        } else {
+          // Reached destination - explode!
+          launcher.remove();
+          createExplosion(endX, endY, colors, firework);
+        }
+      }
+      
+      requestAnimationFrame(animateLaunch);
+    }
+    
+    function createExplosion(x, y, colors, firework) {
+      // Number of particles
+      const particleCount = 80;
+      
+      // Create explosion particles
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        // Random color
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.backgroundColor = color;
+        particle.style.boxShadow = `0 0 6px ${color}`;
+        
+        // Position at explosion center
+        particle.style.left = `${x}px`;
+        particle.style.top = `${y}px`;
+        
+        // Size variation
+        const size = Math.random() * 5 + 2;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        
+        // Random angle and distance
+        const angle = Math.random() * Math.PI * 2;
+        const distance = Math.random() * 150 + 50;
+        const finalX = Math.cos(angle) * distance;
+        const finalY = Math.sin(angle) * distance;
+        
+        // Set custom properties for the animation
+        particle.style.setProperty('--final-transform', `translate(${finalX}px, ${finalY}px)`);
+        
+        // Random duration
+        const duration = Math.random() * 0.8 + 0.8;
+        particle.style.animationDuration = `${duration}s`;
+        
+        firework.appendChild(particle);
+      }
+      
+      // Remove the firework container after animation completes
+      setTimeout(() => {
+        firework.remove();
+      }, 2000);
+    }
+
     resetBtn.addEventListener('click', () => {
       document.querySelectorAll('.bingo-line').forEach(e => e.remove());
       initGame();
@@ -343,7 +596,7 @@
           // For already selected cells, show the percentage note
           const percentNote = cell.querySelector('.percent-note');
           if (percentNote) {
-            percentNote.style.display = 'block';
+            percentNote.style.display = 'flex'; // Changed to flex for vertical layout
           }
         } else {
           // Don't flip non-selected cells
@@ -352,6 +605,9 @@
       });
       
       updateBingoCount();
+      
+      // Trigger enhanced fireworks animation from the DONE button
+      createFireworks(doneBtn);
     });
 
     initGame();

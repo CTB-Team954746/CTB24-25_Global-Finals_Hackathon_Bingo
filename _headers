@@ -1,0 +1,17 @@
+/
+    AYE_BACKEND: CFP
+    AYE_DOMAIN: m-buddies.org
+    AYE_ZONE: CTB_GF_HACKATHON_BINGO
+    AYE_Repo_SYNC: CTB-Team954746/CTB24-25_Global-Finals_Hackathon_Bingo
+
+/*
+    AYE_BACKEND: CFP
+    AYE_DOMAIN: m-buddies.org
+    AYE_ZONE: CTB_GF_HACKATHON_BINGO
+    AYE_Repo_SYNC: CTB-Team954746/CTB24-25_Global-Finals_Hackathon_Bingo
+
+/v2/*
+    AYE_BINGO_Version: 2
+
+/v1/*
+    AYE_BINGO_Version: 1
